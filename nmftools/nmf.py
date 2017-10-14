@@ -3,7 +3,7 @@ from .utils import align_factors
 from tqdm import tqdm
 import numpy as np
 
-def fit_ensemble(data, ranks, nreplicates=10, **model_args):
+def fit_ensemble(data, ranks, nreplicates=10, backend='sklearn', **model_args):
 
     model_args.pop('init', None)
     results = {}
@@ -30,17 +30,17 @@ def fit_ensemble(data, ranks, nreplicates=10, **model_args):
             est = np.dot(W, H)
             results[r]['rmse'].append(np.sqrt(np.mean((est - data)**2)))
 
-    #     # resort by reconstruction error
-    #     ii = np.argsort(results[r]['rmse'])
-    #     for k in 'factors', 'rmse':
-    #         results[r][k] = [results[r][k][i] for i in ii]
+        # resort by reconstruction error
+        ii = np.argsort(results[r]['rmse'])
+        for k in 'factors', 'rmse':
+            results[r][k] = [results[r][k][i] for i in ii]
 
-    #     # compute similarity to best fit
-    #     best_fctr = results[r]['factors'][0]
-    #     for i in range(1, nreplicates):
-    #         fctr = results[r]['factors'][i]
-    #         _, score = align_factors(fctr, best_fctr)
-    #         results[r]['similarity'].append(score)
+        # compute similarity to best fit
+        best_fctr = results[r]['factors'][0]
+        for i in range(1, nreplicates):
+            fctr = results[r]['factors'][i]
+            _, score = align_factors(fctr, best_fctr)
+            results[r]['similarity'].append(score)
 
     # compute svd for comparison
     u, s, v = np.linalg.svd(data, full_matrices=False)
@@ -51,3 +51,10 @@ def fit_ensemble(data, ranks, nreplicates=10, **model_args):
 
     return results
 
+def fit_nmf(data, *args, **kwargs):
+    if backend == 'sklearn':
+        return fit_nmf_sklearn(*args, **kwargs)
+    elif backend == 'spa':
+        return fit_nmf_spa(*args)
+    else:
+        raise ValueError('Backend not recognized.')

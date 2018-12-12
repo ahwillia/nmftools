@@ -1,2 +1,2 @@
-from .nmf import *
+from .ensemble import *
 from .plots import *

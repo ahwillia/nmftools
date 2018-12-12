@@ -22,7 +22,6 @@ def normalize_factors(W, H):
     lam : ndarray
         Vector holding the size / scale of each set of factors.
     """
-    W, H = A
     l1 = np.linalg.norm(W, axis=0, keepdims=True)
     l2 = np.linalg.norm(H, axis=1, keepdims=True)
     return W / l1, H / l2, l1.ravel() * l2.ravel()
@@ -46,8 +45,8 @@ def align_factors(model_1, model_2):
     score :
     """
 
-    W1, H1, lam1 = normalize_factors(model_1)
-    W2, H2, lam2 = normalize_factors(B)
+    W1, H1, lam1 = normalize_factors(*model_1)
+    W2, H2, lam2 = normalize_factors(*model_2)
 
     rank = len(lam1)
     assert len(lam2) == rank

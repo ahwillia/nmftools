@@ -32,7 +32,7 @@ def plot_rmse(results, ax=None, jitter=0.1, plot_svd=True,
         ax = plt.gca()
 
     # compile statistics for plotting
-    ranks, err, sim, min_err = [], [], [], []
+    ranks, err, sim, min_err, svd_rmse = [], [], [], [], []
     for r in results:
         # reconstruction errors for rank-r models
         e = results[r]['rmse']
@@ -48,9 +48,13 @@ def plot_rmse(results, ax=None, jitter=0.1, plot_svd=True,
 
     # plot performance.
     ax.scatter(ranks_jit.ravel(), err, **scatter_kw)
-    ax.plot(ranks[:, 0], min_err, **line_kw)
+    ax.plot(ranks[:, 0], min_err, label='nmf', **line_kw)
     if plot_svd:
-        ax.plot(ranks[:, 0], color='r', alpha=.5)
+        ax.plot(ranks[:, 0], svd_rmse, color='r', alpha=.5, label='svd')
+        ax.legend()
+
+    ax.set_xlabel('model rank')
+    ax.set_ylabel('similarity')
 
     return ax
 
@@ -99,15 +103,7 @@ def plot_similarity(results, ax=None, jitter=0.1, scatter_kw=dict(),
     ax.scatter(ranks_jit.ravel(), sim, **scatter_kw)
     ax.plot(ranks[:, 0], mean_sim, **line_kw)
 
-    if labels:
-        ax.set_xlabel('model rank')
-        ax.set_ylabel('Norm of resids / Norm of data')
-
-    ax.scatter(ranks_jit.ravel(), sim, **scatter_kw)
-
-    # axis labels
-    if labels:
-        ax.set_xlabel('model rank')
-        ax.set_ylabel('model similarity')
+    ax.set_xlabel('model rank')
+    ax.set_ylabel('similarity')
 
     return ax

@@ -1,15 +1,16 @@
-from sklearn.decomposition import NMF, TruncatedSVD
+from sklearn.decomposition import NMF
 from .utils import align_factors
 from tqdm import tqdm
 import numpy as np
 
-def fit_ensemble(data, ranks, nreplicates=10, backend='sklearn', **model_args):
+
+def fit_ensemble(data, ranks, nreplicates=10, **model_args):
 
     model_args.pop('init', None)
     results = {}
 
     for r in tqdm(ranks):
-        
+
         # set number of components
         model_args['n_components'] = r
 
@@ -50,11 +51,3 @@ def fit_ensemble(data, ranks, nreplicates=10, backend='sklearn', **model_args):
         results[r]['svd_rmse'] = np.sqrt(np.mean((est - data)**2))
 
     return results
-
-def fit_nmf(data, *args, **kwargs):
-    if backend == 'sklearn':
-        return fit_nmf_sklearn(*args, **kwargs)
-    elif backend == 'spa':
-        return fit_nmf_spa(*args)
-    else:
-        raise ValueError('Backend not recognized.')
